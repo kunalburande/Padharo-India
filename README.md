@@ -3,7 +3,14 @@
 Padharo India is a comprehensive web application designed to streamline the process of booking various travel services across India. This platform serves as a one-stop solution for travelers, offering functionalities to book cabs, hotels, tour guides, and curated tour packages.
 
 The project is built with a modern tech stack, featuring a React frontend and a Node.js (Express) backend, connecting to a MySQL database.
+## Features ✨
 
+* **Cab Booking:** Easily search and book from a variety of cabs, including Sedans, SUVs, and MPVs.
+* **Hotel Reservations:** Discover and book hotels with detailed information, including amenities, ratings, and pricing.
+* **Tour Guide Services:** Find and hire experienced local tour guides with specialties in history, cuisine, and more.
+* **Tour Packages:** Explore and book curated tour packages for popular destinations like the Golden Triangle and Kerala Backwaters.
+* **User Authentication:** Secure sign-up and login functionality for a personalized experience.
+* **Responsive Design:** A fully responsive layout that works seamlessly on desktops, tablets, and mobile devices.
 ## Tech Stack
 
   * **Frontend:** React, React Router, Tailwind CSS

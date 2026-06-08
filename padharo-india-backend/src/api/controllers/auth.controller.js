@@ -2,7 +2,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js'; // Corrected filename and path depth
-// import { generateOtp, sendOtpService } from '../../utils/otpHelper.js'; // Removed
+import { generateOtp, sendOtpService } from '../../utils/otpHelper.js'; // Removed
 // ... rest of the code
 import dotenv from 'dotenv';
 import path from 'path';
@@ -28,7 +28,11 @@ const generateToken = (userId) => {
 };
 
 // Removed calculateOtpExpiry function
-
+const calculateOtpExpiry = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + OTP_EXPIRY_MINUTES);
+    return now;
+};
 // --- NEW Validation Helpers ---
 const validateEmailDomain = (email) => {
     // Allow common domains
@@ -106,7 +110,21 @@ export const signup = async (req, res, next) => {
         });
 
         // --- OTP Logic Removed ---
+        const otp = generateOtp();
+        const expiry = calculateOtpExpiry();
+        const otpStored = await User.storeOtp(mobile, otp, expiry);
 
+        if (!otpStored) {
+             console.error(`Failed to store OTP for mobile: ${mobile}`);
+            return res.status(500).json({ message: 'Failed to initiate verification. Please try again.' });
+        }
+
+        const otpSent = await sendOtpService(mobile, otp);
+
+        if (!otpSent) {
+             console.error(`Failed to send OTP for mobile: ${mobile}`);
+            return res.status(500).json({ message: 'Account created, but failed to send verification OTP. Please contact support or try resending.' });
+        }
         // --- Sign up is now immediate login ---
         const token = generateToken(userId);
         const newUserDetails = await User.findById(userId);
@@ -132,6 +150,40 @@ export const signup = async (req, res, next) => {
 };
 
 // --- Removed verifyOtp controller ---
+export const verifyOtp = async (req, res, next) => {
+    const { mobile, otp } = req.body;
+
+    if (!mobile || !otp) {
+        return res.status(400).json({ message: 'Mobile number and OTP are required.' });
+    }
+
+    try {
+        const user = await User.verifyOtp(mobile, otp);
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired OTP.' });
+        }
+
+        const markedVerified = await User.markAsVerified(user.id);
+
+        if (!markedVerified) {
+             console.error(`Failed to mark user ${user.id} as verified after OTP success.`);
+             return res.status(500).json({ message: 'Verification failed. Please try again.' });
+        }
+
+        const token = generateToken(user.id);
+        const verifiedUserDetails = await User.findById(user.id);
+
+        res.status(200).json({
+            message: 'OTP verified successfully! Registration complete.',
+            token,
+            user: verifiedUserDetails,
+        });
+
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const login = async (req, res, next) => {
     const { email, password } = req.body;
@@ -176,5 +228,41 @@ export const login = async (req, res, next) => {
         next(error); // Pass errors to the global error handler
     }
 };
+export const resendOtp = async (req, res, next) => {
+    const { mobile } = req.body;
+     if (!mobile) {
+        return res.status(400).json({ message: 'Mobile number is required.' });
+    }
 
+    try {
+        const user = await User.findByMobile(mobile);
+        if (!user) {
+            return res.status(404).json({ message: 'Mobile number not registered.' });
+        }
+        if (user.isVerified) {
+            return res.status(400).json({ message: 'Account is already verified.' });
+        }
+
+        const otp = generateOtp();
+        const expiry = calculateOtpExpiry();
+        const otpStored = await User.storeOtp(mobile, otp, expiry);
+
+         if (!otpStored) {
+             console.error(`Resend OTP: Failed to store OTP for mobile: ${mobile}`);
+            return res.status(500).json({ message: 'Failed to generate new OTP. Please try again.' });
+        }
+
+        const otpSent = await sendOtpService(mobile, otp);
+
+        if (!otpSent) {
+             console.error(`Resend OTP: Failed to send OTP for mobile: ${mobile}`);
+            return res.status(500).json({ message: 'Failed to resend verification OTP. Please contact support.' });
+        }
+
+         res.status(200).json({ message: `New OTP sent to ${mobile}.` });
+
+    } catch (error) {
+        next(error);
+    }
+}
 // --- Removed resendOtp controller ---
