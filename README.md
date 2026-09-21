@@ -35,7 +35,7 @@ To get a local copy up and running, follow these simple steps. This project is s
 1.  **Navigate to the Backend Directory**
 
     ```sh
-    cd shivansh-bharti2002/padharo-india/Padharo-India-577026f61f8c9bea860b2d2ffcd190ddf02eb68e/padharo-india-backend
+    cd padharo-india/padharo-India-577026f61f8c9bea860b2d2ffcd190ddf02eb68e/padharo-india-backend
     ```
 
 2.  **Install Dependencies**
@@ -79,7 +79,7 @@ To get a local copy up and running, follow these simple steps. This project is s
     Navigate to the frontend (root) directory of the project.
 
     ```sh
-    cd shivansh-bharti2002/padharo-india/Padharo-India-577026f61f8c9bea860b2d2ffcd190ddf02eb68e
+    cd padharo-india/Padharo-India-577026f61f8c9bea860b2d2ffcd190ddf02eb68e
     ```
 
 2.  **Install Dependencies**
