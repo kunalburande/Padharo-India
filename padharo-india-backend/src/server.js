@@ -23,6 +23,10 @@ import reviewRoutes from './api/routes/review.routes.js'; //
 // --- NEW PHASE 5 IMPORTS ---
 import supportRoutes from './api/routes/support.routes.js';
 import adminRoutes from './api/routes/admin.routes.js';
+import businessCabRoutes from './api/routes/business.cab.routes.js';
+import businessGuideRoutes from './api/routes/business.guide.routes.js';
+import businessHotelRoutes from './api/routes/business.hotel.routes.js';
+import queryRoutes from './api/routes/query.routes.js';
 // -----------------------------------------------------------
 
 // Correctly locate .env relative to this file (server.js is in src/)
@@ -88,6 +92,10 @@ app.use('/api/guides', guideRoutes); //
 app.use('/api/packages', packageRoutes); //
 app.use('/api/bookings', bookingRoutes); //
 app.use('/api/reviews', reviewRoutes); //
+app.use('/api/business/cabs', businessCabRoutes);
+app.use('/api/business/guides', businessGuideRoutes);
+app.use('/api/business/hotels', businessHotelRoutes);
+app.use('/api/query', queryRoutes);
 
 // --- NEW PHASE 5 ROUTES ---
 // User-facing support routes
